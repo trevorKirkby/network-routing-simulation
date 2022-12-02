@@ -17,12 +17,12 @@ topologies = os.listdir('topologies')
 workloads = os.listdir('topologies')
 
 ALGORITHM = 'baseline_optimal' # Should eventually be picked via command line arg
-TOPOLOGY = '100_hosts_procedural_2'
-WORKLOAD = 'sample_workload2'
+TOPOLOGY = 'sample_topology3' #'100_hosts_procedural_2'
+WORKLOAD = 'sample_workload2' #'100_hosts_procedural_1'
 LIMIT = 20000
 ANIMATION_SPEEDUP = 5
 HURST = 0.75
-ANIMATE = True
+ANIMATE = False
 
 stochastic_init(HURST)
 

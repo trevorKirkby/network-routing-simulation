@@ -2,11 +2,11 @@ import random
 import math
 
 # I/O
-OUTFILE = 'workloads/100_hosts_procedural_1.csv'
+OUTFILE = 'workloads/500_hosts_procedural_10.csv'
 
 # Setup
-N_HOSTS = 100
-N_CONNECTIONS = 50
+N_HOSTS = 500
+N_CONNECTIONS = 150 # 50 for 100_hosts, 150 for 500_hosts
 TIME = 2000
 
 # Power law distributions
@@ -38,19 +38,19 @@ packet_size = pareto(params['packet_max'], params['packet_pareto'])
 connection_density = pareto(params['connection_max'], params['connection_pareto'])
 
 workload = []
-for _ in N_CONNECTIONS:
+for _ in range(N_CONNECTIONS):
     source = random.randint(0,N_HOSTS-1)
     dest = random.randint(0,N_HOSTS-1)
     packet_count = sample(connection_density)
     avg_time_increment = TIME / (packet_count+1)
     t = 0
-    for packet in range(packet_count):
+    for _ in range(packet_count):
         byte_size = sample(packet_size)
         t += random.uniform(0.5,1.5)*avg_time_increment
         if random.random() > 0.5:
-            workload.append([t, source, dest, byte_size])
+            workload.append([int(t), source, dest, byte_size])
         else:
-            workload.append([t, dest, source, byte_size])
+            workload.append([int(t), dest, source, byte_size])
 
 workload = sorted(workload, key = lambda x: x[0])
 
