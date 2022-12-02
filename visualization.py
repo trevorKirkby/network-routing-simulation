@@ -4,7 +4,7 @@ import networkx as nx
 import numpy as np
 
 color_vals = plt.get_cmap('rainbow')
-color_vals = {i:color_vals((6-i)/7) for i in range(0,7)}
+color_vals = {i:color_vals(i/7) for i in range(0,7)}
 
 inverted_color_vals = {v:k for k,v in color_vals.items()}
 
@@ -50,7 +50,7 @@ def animate_network(media, node_colors_animated, edge_colors_animated, show_labe
     #plt.axis('off')
 
     #fig = plt.gcf()
-    fig = plt.figure()
+    fig = plt.figure(facecolor='#212121')
 
     def update(ii):
         fig.clear()

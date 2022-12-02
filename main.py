@@ -3,14 +3,12 @@ import numpy as np
 from simulation import *
 from visualization import *
 
-import headless
-import headless_queues
-import cheater
+import baseline_worst
+import baseline_optimal
+import aodv
+import bgp
 
-# Headless = zero effort routing, abysmal speed and very high packet dropping
-# Headless w/ queues = even worse speed, but puts in a basic effort to avoid dropped packets
-# Cheater = theoretically best routing solutions, peeks at information in the simulation that real-life routers don't know about
-algorithms = ['headless', 'headless_queues', 'cheater']
+algorithms = ['baseline_worst','baseline_optimal','aodv','bgp']
 
 ALGORITHM = algorithms[2] # Should eventually be picked via command line arg
 LIMIT = 20000
