@@ -17,12 +17,12 @@ topologies = os.listdir('topologies')
 workloads = os.listdir('topologies')
 
 ALGORITHM = 'baseline_optimal' # Should eventually be picked via command line arg
-TOPOLOGY = '20_hosts_procedural_1'
+TOPOLOGY = '20_hosts_procedural_2'
 WORKLOAD = '20_hosts_procedural_1'
 LIMIT = 20000
 ANIMATION_SPEEDUP = 5
 HURST = 0.75
-ANIMATE = True
+ANIMATE = False
 
 stochastic_init(HURST)
 
@@ -89,16 +89,20 @@ def main():
     dropped = 0
     lost_data = 0
     transit_time = 0
+    tail_latency = 0
     for _, packet in workload:
         total_data += packet.byte_size
         if packet.time_arrived == -1:
             dropped += 1
             lost_data += packet.byte_size
         else:
-            transit_time += (packet.time_arrived - packet.time_sent)
+            latency = (packet.time_arrived - packet.time_sent)
+            transit_time += latency
+            if latency > tail_latency:
+                tail_latency = latency
     print(f'PACKET LOSS RATE: {dropped / len(workload)}')
     print(f'DATA LOSS RATE: {lost_data / total_data}')
-    print(f'AVERAGE LATENCY: {transit_time / (len(workload)-dropped) if (len(workload)-dropped) != 0 else None} (units of time per packet)')
+    print(f'TAIL LATENCY: {tail_latency} (units of time)')
     print(f'AVERAGE THROUGHPUT: {(total_data - lost_data) / transit_time if transit_time != 0 else None} (bytes per unit of time)')
     if ANIMATE: animate_network(media, node_colors_animated, edge_colors_animated)
     return 0

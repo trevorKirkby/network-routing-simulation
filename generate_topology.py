@@ -2,18 +2,18 @@ import random
 import math
 
 # I/O
-OUTFILE = 'topologies/500_hosts_procedural_10.csv'
+OUTFILE = 'topologies/20_hosts_procedural_1.csv'
 
 # Hosts
-N_HOSTS = 500
+N_HOSTS = 20
 
 # Power law distributions
 DISTRIBUTION_PARAMETERS = {
     # Links
-    'degree_max' : 100, # 8 for 20_hosts, 25 for 100_hosts, 100 for 500_hosts
-    'degree_pareto' : 1, # 0.1 for 20_hosts, 0.25 for 100_hosts, 1 for 500_hosts
+    'degree_max' : 8, # 8 for 20_hosts, 25 for 100_hosts, 100 for 500_hosts
+    'degree_pareto' : 0.1, # 0.1 for 20_hosts, 0.25 for 100_hosts, 1 for 500_hosts
     # Latencies
-    'host_latency_max' : 20,
+    'host_latency_max' : 5,
     'host_latency_pareto' : 1,
     'link_latency_max' : 3,
     'link_latency_pareto' : 0.1,

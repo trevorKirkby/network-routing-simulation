@@ -4,7 +4,7 @@ class Router(Medium):
     def __init__(self, *args):
         super(Router, self).__init__(*args)
         self.routes_table = {} # dest : (id, next hop, total distance)
-        self.hello_interval = 20
+        self.hello_interval = 100
         self.hello_counter = self.hello_interval
         self.neighbors_known = {}
         self.stale_ids = []

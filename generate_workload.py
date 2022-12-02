@@ -5,7 +5,7 @@ import math
 OUTFILE = 'workloads/20_hosts_procedural_1.csv'
 
 # Setup
-N_HOSTS = 500
+N_HOSTS = 20
 N_CONNECTIONS = 8 # 8 for 20_hosts, 50 for 100_hosts, 150 for 500_hosts
 TIME = 800 # 800 for 20_hosts, 2000 for 100_hosts and 500_hosts
 
