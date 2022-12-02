@@ -10,8 +10,8 @@ N_HOSTS = 500
 # Power law distributions
 DISTRIBUTION_PARAMETERS = {
     # Links
-    'degree_max' : 50, # 25 for 100_hosts, 50 for 500_hosts
-    'degree_pareto' : 0.5, # 0.25 for 100_hosts, 0.5 for 500_hosts
+    'degree_max' : 100, # 8 for 20_hosts, 25 for 100_hosts, 100 for 500_hosts
+    'degree_pareto' : 1, # 0.1 for 20_hosts, 0.25 for 100_hosts, 1 for 500_hosts
     # Latencies
     'host_latency_max' : 20,
     'host_latency_pareto' : 1,
@@ -32,8 +32,8 @@ DISTRIBUTION_PARAMETERS = {
     'link_drop_pareto' : 1,
 }
 
-# Randomization across orders of magnitude
-DEVIATION = 3
+# Randomization across +/- orders of magnitude
+DEVIATION = 2
 
 for key in DISTRIBUTION_PARAMETERS:
     param = DISTRIBUTION_PARAMETERS[key]
@@ -45,6 +45,9 @@ def pareto(maximum, falloff):
 
 def sample(function):
     return math.ceil(function(random.random() * 9 + 1))
+
+def float_sample(function):
+    return function(random.random() * 9 + 1)
 
 params = DISTRIBUTION_PARAMETERS
 degree = pareto(params['degree_max'], params['degree_pareto'])
@@ -61,7 +64,7 @@ links = []
 
 # Generate hosts in the network
 for id in range(N_HOSTS):
-    hosts.append([id, sample(multiprocessing), sample(host_latency), sample(host_throughput), sample(host_drop), 1])
+    hosts.append([id, sample(multiprocessing), sample(host_latency), sample(host_throughput), float_sample(host_drop), 1])
 
 # Generate a network graph where the degree of each vertex is approximately described by a power law
 link_idx = len(hosts)
@@ -76,7 +79,7 @@ for host in hosts:
         for _ in range(n_links - existing_links):
             target = random.randint(0, len(hosts)-1)
             while target == id: target = random.randint(0, len(hosts)-1)
-            links.append([link_idx, 1, sample(link_latency), sample(link_throughput), sample(link_drop), 0, f'[{id} {target}]'])
+            links.append([link_idx, 1, sample(link_latency), sample(link_throughput), float_sample(link_drop), 0, f'[{id} {target}]'])
             link_idx += 1
 
 # Make sure the graph is connected
@@ -107,7 +110,7 @@ while len(connected_graph) < N_HOSTS:
     disconnected_ids = [host[0] for host in hosts if host[0] not in connected_ids]
     source = random.choice(connected_ids)
     dest = random.choice(disconnected_ids)
-    links.append([link_idx, 1, sample(link_latency), sample(link_throughput), sample(link_drop), 0, f'[{source} {dest}]'])
+    links.append([link_idx, 1, sample(link_latency), sample(link_throughput), float_sample(link_drop), 0, f'[{source} {dest}]'])
     link_idx += 1
     connected_graph = get_connected(hosts[0])
 

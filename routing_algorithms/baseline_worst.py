@@ -6,9 +6,11 @@ class Router(Medium):
         self.send_buffer = [] # TODO: all lists of packet refs anywhere should count towards a metric for their lengths, memory usage should be at least a little penalized
         self.seen = []
         self.logic = True
+        self.queue_max = 200
     def receive(self, packet, one_hop_sender):
         if packet in self.seen: return
         self.seen.append(packet)
+        if len(self.seen > self.queue_max): self.seen = self.seen[1:]
         super(Router, self).receive(packet, one_hop_sender)
     def receive_full(self, packet, _):
         self.buffer.append(packet)

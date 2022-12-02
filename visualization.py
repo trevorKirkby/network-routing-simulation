@@ -15,11 +15,11 @@ def make_graph(media):
     for medium in media.values():
         if medium.logic == False and len(medium.connections) == 2:
             G.add_edge(medium.connections[0].id+1, medium.connections[1].id+1, id=medium.id)
-            print(medium.connections[0].id, medium.connections[1].id)
+            #print(medium.connections[0].id, medium.connections[1].id)
         else:
             G.add_node(medium.id+1, id=medium.id)
             ids[medium.id+1] = medium.id
-            print(medium.id)
+            #print(medium.id)
     return G, ids
 
 # Get the correct coloring for each aspect of the graph at a given moment.
