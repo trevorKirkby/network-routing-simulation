@@ -24,6 +24,7 @@ class Router(Medium):
                     target.receive(packet, self)
                     self.send_buffer.remove((target, packet))
     def process(self, packet, one_hop_sender):
+        if packet.dest == self.id: return
         for connection in self.connections:
             if connection != one_hop_sender:
                 if len(connection.in_transit) < connection.pathways or isinstance(connection, Router):

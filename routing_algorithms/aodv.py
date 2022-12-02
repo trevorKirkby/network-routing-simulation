@@ -27,8 +27,8 @@ class Router(Medium):
             self.neighbors_known[neighbor_id] -= 1
             if self.neighbors_known[neighbor_id] <= 0:
                 for dest, route in self.routes_table.items():
-                    if rout[1] == neighbor_id:
-                        self.receive(Packet(self.id, , content=f"RERR:{self.buffer[0].dest},{self.routes_table[packet.dest][1]}"), self)
+                    if route[1] == neighbor_id:
+                        self.receive(Packet(self.id, -1, content=f"RERR:{self.buffer[0].dest},{self.routes_table[packet.dest][1]}"), self)
                 del self.neighbors_known[neighbor_id] # Forget a neighbor if we haven't gotten a hello message recently
         if len(self.buffer) and len(self.in_transit) < self.pathways:
             packet = self.buffer[0]
@@ -37,20 +37,25 @@ class Router(Medium):
                 if self.routes_table[packet.dest][1] in self.neighbors_known:
                     self.receive(self.buffer[0], self)
                 else:
-                    self.receive(Packet(self.id, packet.source, content=f"RERR:{packet.dest},{self.routes_table[packet.dest][1]}"), self)
+                    self.receive(Packet(self.id, -1, content=f"RERR:{packet.dest},{self.routes_table[packet.dest][1]}"), self)
             else:
-                self.receive(Packet(self.id, packet.source, content=f"RERR:{packet.dest},NO_ROUTE"), self)
+                self.receive(Packet(self.id, -1, content=f"RERR:{packet.dest},NO_ROUTE"), self)
     def process(self, packet, one_hop_sender):
         if packet.dest == self.id:
             if packet.content != None:
                 if packet.content == "HELLO":
                     self.neighbors_known[packet.source] = 50
+            return
+        if packet.dest == -1:
+            if packet.content != None:
                 request_type, contents = packet.content.split(":")
                 contents = contents.split(",")
+                if request_type == "RREQ":
+                    pass
                 if request_type == "RREP":
-                    contents == 
+                    pass
                 if request_type == "RERR":
-            return
+                    pass
         for connection in self.connections:
             if connection != one_hop_sender:
                 if len(connection.in_transit) < connection.pathways or isinstance(connection, Router):

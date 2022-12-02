@@ -1,24 +1,36 @@
+import os
+
 import numpy as np
 
 from simulation import *
 from visualization import *
 
-import baseline_worst
-import baseline_optimal
-import aodv
-import bgp
+from routing_algorithms import baseline_worst
+from routing_algorithms import baseline_optimal
+from routing_algorithms import aodv
+from routing_algorithms import rpl
+from routing_algorithms import bgp
+from routing_algorithms import myprotocol
 
-algorithms = ['baseline_worst','baseline_optimal','aodv','bgp']
+algorithms = [os.path.splitext(filename)[0] for filename in os.listdir('routing_algorithms')]
+topologies = os.listdir('topologies')
+workloads = os.listdir('topologies')
 
-ALGORITHM = algorithms[2] # Should eventually be picked via command line arg
+ALGORITHM = 'baseline_optimal' # Should eventually be picked via command line arg
+TOPOLOGY = '100_hosts_procedural_1'
+WORKLOAD = 'sample_workload2'
 LIMIT = 20000
 ANIMATION_SPEEDUP = 5
+HURST = 0.75
+ANIMATE = True
+
+stochastic_init(HURST)
 
 def main():
     print('LOADING TOPOLOGY')
     media = {}
     connections = set()
-    with open('sample_topology3.csv', 'r') as topology_file:
+    with open(f'topologies/{TOPOLOGY}.csv', 'r') as topology_file:
         topology_data = topology_file.read()
     for line in topology_data.split('\n'):
         if len(line) == 0 or line[0] == '#': continue
@@ -31,9 +43,9 @@ def main():
         # Instantiating the Media
         vals = [float(val) if i == 4 else int(val) for i, val in enumerate(vals)]
         if vals[5]: # if logic=True, patch in routing logic from one of the algorithms
-            medium = globals()[ALGORITHM.lower()].Router(*vals[:5])
+            medium = globals()[ALGORITHM.lower()].Router(*vals[:5], 1, LIMIT) #rate_deviation=1, max_duration=LIMIT
         else:
-            medium = Medium(*vals[:5])
+            medium = Medium(*vals[:5], 1, LIMIT) #rate_deviation=1, max_duration=LIMIT
         for connected_id in connected_ids:
             connections.add((medium.id, connected_id))
         media[medium.id] = medium
@@ -44,7 +56,7 @@ def main():
     print('DONE LOADING TOPOLOGY')
     print('LOADING WORKLOAD')
     workload = []
-    with open('sample_workload2.csv', 'r') as workload_file:
+    with open(f'workloads/{WORKLOAD}.csv', 'r') as workload_file:
         workload_data = workload_file.read()
     for line in workload_data.split('\n'):
         if len(line) == 0 or line[0] == '#': continue
@@ -88,7 +100,7 @@ def main():
     print(f'DATA LOSS RATE: {lost_data / total_data}')
     print(f'AVERAGE LATENCY: {transit_time / (len(workload)-dropped) if (len(workload)-dropped) != 0 else None} (units of time per packet)')
     print(f'AVERAGE THROUGHPUT: {(total_data - lost_data) / transit_time if transit_time != 0 else None} (bytes per unit of time)')
-    animate_network(media, node_colors_animated, edge_colors_animated)
+    if ANIMATE: animate_network(media, node_colors_animated, edge_colors_animated)
     return 0
 
 if __name__ == '__main__':
