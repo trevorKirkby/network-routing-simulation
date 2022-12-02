@@ -1,12 +1,7 @@
 import math
 from simulation import *
 
-'''
-Completely Garbage Protocol: Forward packets to everyone and anyone who will listen without checking for the intended recipient, use lots of memory on remembering the last N packets received to avoid constant router loops, drop packets if you have too many.
-Omniscient Cheating Protocol: Find a completely optimal routing solution using complete knowledge of the simulation and the A* algorithm.
-
-Slide: Background & Related Work, Topology Selection, Network Routing, Low Power and Ad-Hoc Network Routing
-'''
+# 
 
 class Router(Medium):
     def __init__(self, *args):
@@ -32,8 +27,6 @@ class Router(Medium):
         else:
             self.send_buffer.append((target, packet))
     # We know the exact time it takes to pass through every medium currently, so we can just use dijkstra's algorithm and have a theoretically optimal solution
-    # TODO: Account for the option of splitting packets and sending the pieces down different paths
-    # TODO: Somehow account for knowledge about the current average amount of traffic going through a link already? This feels like an ant swarm problem
     def time(self, packet, medium):
         return math.ceil(packet.byte_size/(medium.byte_rate/(len(medium.in_transit)+1))) + medium.overhead
     def process(self, packet, _):
@@ -56,10 +49,10 @@ class Router(Medium):
                         if connection not in best_paths or t < best_paths[connection.id][1]:
                             best_paths[connection.id] = (best_paths[medium.id][0] + [medium], t)
             frontier = newfrontier
-        print('SHORTEST PATH:')
-        print([medium.id for medium in best_paths[packet.dest][0]])
-        print(packet.dest)
-        print('DEST:')
-        print(best_paths[packet.dest][0][1].id)
+        #print('SHORTEST PATH:')
+        #print([medium.id for medium in best_paths[packet.dest][0]])
+        #print(packet.dest)
+        #print('DEST:')
+        #print(best_paths[packet.dest][0][1].id)
         target = best_paths[packet.dest][0][1]
         self.send(packet, target)

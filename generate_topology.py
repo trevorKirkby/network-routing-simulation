@@ -10,8 +10,8 @@ N_HOSTS = 500
 # Power law distributions
 DISTRIBUTION_PARAMETERS = {
     # Links
-    'degree_max' : 25,
-    'degree_pareto' : 0.25,
+    'degree_max' : 50, # 25 for 100_hosts, 50 for 500_hosts
+    'degree_pareto' : 0.5, # 0.25 for 100_hosts, 0.5 for 500_hosts
     # Latencies
     'host_latency_max' : 20,
     'host_latency_pareto' : 1,
@@ -63,13 +63,10 @@ links = []
 for id in range(N_HOSTS):
     hosts.append([id, sample(multiprocessing), sample(host_latency), sample(host_throughput), sample(host_drop), 1])
 
-# Generate a connected network graph where the degree of each vertex is approximately described by a power law
+# Generate a network graph where the degree of each vertex is approximately described by a power law
 link_idx = len(hosts)
 for host in hosts:
     id = host[0]
-    if id != 0:
-        links.append([link_idx, 1, sample(link_latency), sample(link_throughput), sample(link_drop), 0, f'[{id-1} {id}]'])
-        link_idx += 1
     existing_links = 0
     for link in links:
         if link[-1].split(' ')[1][:-1] == str(id) or link[-1].split(' ')[0][1:] == str(id):
@@ -81,6 +78,38 @@ for host in hosts:
             while target == id: target = random.randint(0, len(hosts)-1)
             links.append([link_idx, 1, sample(link_latency), sample(link_throughput), sample(link_drop), 0, f'[{id} {target}]'])
             link_idx += 1
+
+# Make sure the graph is connected
+def get_connected(source):
+    connected = []
+    frontier = [source]
+    while len(frontier) != 0:
+        for host in frontier:
+            if host not in connected: connected.append(host)
+        newfrontier = []
+        for host in frontier:
+            id = host[0]
+            for link in links:
+                if link[-1].split(' ')[1][:-1] == str(id):
+                    target = int(link[-1].split(' ')[0][1:])
+                    if hosts[target] not in connected:
+                        newfrontier.append(hosts[target])
+                if link[-1].split(' ')[0][1:] == str(id):
+                    target = int(link[-1].split(' ')[1][:-1])
+                    if hosts[target] not in connected:
+                        newfrontier.append(hosts[target])
+        frontier = newfrontier
+    return connected
+
+connected_graph = get_connected(hosts[0])
+while len(connected_graph) < N_HOSTS:
+    connected_ids = [host[0] for host in connected_graph]
+    disconnected_ids = [host[0] for host in hosts if host[0] not in connected_ids]
+    source = random.choice(connected_ids)
+    dest = random.choice(disconnected_ids)
+    links.append([link_idx, 1, sample(link_latency), sample(link_throughput), sample(link_drop), 0, f'[{source} {dest}]'])
+    link_idx += 1
+    connected_graph = get_connected(hosts[0])
 
 nodes = hosts + links
 with open(OUTFILE, 'w') as out:
