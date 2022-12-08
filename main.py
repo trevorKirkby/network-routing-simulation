@@ -5,24 +5,34 @@ import numpy as np
 from simulation import *
 from visualization import *
 
-from routing_algorithms import baseline_worst
-from routing_algorithms import baseline_optimal
+from routing_algorithms import baseline_slow
+from routing_algorithms import baseline_fast
 from routing_algorithms import aodv
 from routing_algorithms import rpl
-from routing_algorithms import bgp
+from routing_algorithms import bgp_lite
 from routing_algorithms import myprotocol
+
+from scenarios import normal
+from scenarios import disruption
+from scenarios import topology_shift
 
 algorithms = [os.path.splitext(filename)[0] for filename in os.listdir('routing_algorithms')]
 topologies = os.listdir('topologies')
 workloads = os.listdir('topologies')
 
-ALGORITHM = 'baseline_optimal' # Should eventually be picked via command line arg
-TOPOLOGY = '20_hosts_procedural_2'
-WORKLOAD = '20_hosts_procedural_1'
+ALGORITHM = 'baseline_fast' # Should eventually be picked via command line arg
+TOPOLOGY = '20_hosts_procedural_1' #'100_hosts_procedural_3' #
+WORKLOAD = '20_hosts_procedural_7' #'100_hosts_procedural_1' #
+SCENARIO = 'normal'
+
+# fractal gaussian noise parameters
+RATE_DEVIATION = 1
+HURST = 0.75 # While the specific value of this is a bit uncertain, most sources I've seen seem to indicate that a value in the ballpark of 0.75 works best for approximately modeling delays over the actual internet
+
+# animation / timing parameters
 LIMIT = 20000
-ANIMATION_SPEEDUP = 5
-HURST = 0.75
-ANIMATE = False
+ANIMATION_SPEEDUP = 1#5
+ANIMATE = True
 
 stochastic_init(HURST)
 
@@ -43,9 +53,9 @@ def main():
         # Instantiating the Media
         vals = [float(val) if i == 4 else int(val) for i, val in enumerate(vals)]
         if vals[5]: # if logic=True, patch in routing logic from one of the algorithms
-            medium = globals()[ALGORITHM.lower()].Router(*vals[:5], 1, LIMIT) #rate_deviation=1, max_duration=LIMIT
+            medium = globals()[ALGORITHM.lower()].Router(*vals[:5], RATE_DEVIATION, LIMIT) #rate_deviation=1, max_duration=LIMIT
         else:
-            medium = Medium(*vals[:5], 1, LIMIT) #rate_deviation=1, max_duration=LIMIT
+            medium = Medium(*vals[:5], RATE_DEVIATION, LIMIT) #rate_deviation=1, max_duration=LIMIT
         for connected_id in connected_ids:
             connections.add((medium.id, connected_id))
         media[medium.id] = medium
@@ -64,24 +74,28 @@ def main():
         vals = [int(val) for val in line.split(',')]
         workload.append((vals[0], Packet(vals[1], vals[2], size=vals[3])))
     print('DONE LOADING WORKLOAD')
+    print('LOADING SCENARIO')
+    scenario = globals()[SCENARIO.lower()].Scenario()
+    print('DONE LOADING SCENARIO')
     print('RUNNING SIMULATION')
     node_colors_animated = []
     edge_colors_animated = []
     t = 0
     running = True
     while running:
-        print(f't={t}')
+        #print(f't={t}')
         for start_time, packet in workload:
             if start_time == t:
                 media[packet.source].receive(packet, None)
                 packet.time_sent = t
         for medium in media.values():
             medium.tick(t)
+        scenario.tick(t, media)
         if t % ANIMATION_SPEEDUP == 0:
             node_colors, edge_colors = make_colors(media)
             node_colors_animated.append(node_colors)
             edge_colors_animated.append(edge_colors)
-        if all([packet.time_sent != -1 for _, packet in workload]) and all([len(medium.in_transit) == 0 for medium in media.values()]): running = False
+        if all([packet.time_sent != -1 for _, packet in workload]) and all([len(medium.in_transit) == 0 for medium in media.values()]) and all([medium.buffering == False for medium in media.values()]): running = False
         if t == LIMIT: running = False
         t += 1
     print(f'DONE RUNNING SIMULATION ({ALGORITHM})')

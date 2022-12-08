@@ -29,6 +29,8 @@ def make_colors(media):
     for key in media:
         medium = media[key]
         density = len(medium.in_transit)
+        if medium.logic == True:
+            density += medium.count_buffers()
         color = color_vals[min(density, 5)]
         if medium.logic == False and len(medium.connections) == 2:
             edge_colors[medium.id] = color

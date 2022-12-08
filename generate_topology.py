@@ -2,16 +2,16 @@ import random
 import math
 
 # I/O
-OUTFILE = 'topologies/20_hosts_procedural_1.csv'
+OUTFILE = 'topologies/100_hosts_procedural_1.csv'
 
 # Hosts
-N_HOSTS = 20
+N_HOSTS = 100
 
 # Power law distributions
 DISTRIBUTION_PARAMETERS = {
     # Links
-    'degree_max' : 8, # 8 for 20_hosts, 25 for 100_hosts, 100 for 500_hosts
-    'degree_pareto' : 0.1, # 0.1 for 20_hosts, 0.25 for 100_hosts, 1 for 500_hosts
+    'degree_max' : 25, # 8 for 20_hosts, 25 for 100_hosts, 100 for 500_hosts
+    'degree_pareto' : 0.25, # 0.1 for 20_hosts, 0.25 for 100_hosts, 1 for 500_hosts
     # Latencies
     'host_latency_max' : 5,
     'host_latency_pareto' : 1,
@@ -71,13 +71,15 @@ link_idx = len(hosts)
 for host in hosts:
     id = host[0]
     existing_links = 0
+    # existing_links = []
     for link in links:
         if link[-1].split(' ')[1][:-1] == str(id) or link[-1].split(' ')[0][1:] == str(id):
             existing_links += 1
+            # existing_links.append()
     n_links = sample(degree)
-    if n_links > existing_links:
+    if n_links > existing_links: #len(existing_links)
         for _ in range(n_links - existing_links):
-            target = random.randint(0, len(hosts)-1)
+            target = random.randint(0, len(hosts)-1) # not in existing_links
             while target == id: target = random.randint(0, len(hosts)-1)
             links.append([link_idx, 1, sample(link_latency), sample(link_throughput), float_sample(link_drop), 0, f'[{id} {target}]'])
             link_idx += 1

@@ -2,12 +2,13 @@ import random
 import math
 
 # I/O
-OUTFILE = 'workloads/20_hosts_procedural_1.csv'
+OUTFILE = 'workloads/20_hosts_procedural_10.csv'
 
 # Setup
 N_HOSTS = 20
 N_CONNECTIONS = 8 # 8 for 20_hosts, 50 for 100_hosts, 150 for 500_hosts
 TIME = 800 # 800 for 20_hosts, 2000 for 100_hosts and 500_hosts
+LEAD_TIME = 200 # Amount of time before any packets get sent, allows non-ad-hoc protocols some time to set up
 
 # Power law distributions
 DISTRIBUTION_PARAMETERS = {
@@ -43,7 +44,7 @@ for _ in range(N_CONNECTIONS):
     dest = random.randint(0,N_HOSTS-1)
     packet_count = sample(connection_density)
     avg_time_increment = TIME / (packet_count+1)
-    t = 0
+    t = LEAD_TIME
     for _ in range(packet_count):
         byte_size = sample(packet_size)
         t += random.uniform(0.5,1.5)*avg_time_increment
