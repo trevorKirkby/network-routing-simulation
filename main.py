@@ -20,10 +20,10 @@ algorithms = [os.path.splitext(filename)[0] for filename in os.listdir('routing_
 topologies = os.listdir('topologies')
 workloads = os.listdir('topologies')
 
-ALGORITHM = 'aodv' # Should eventually be picked via command line arg
-TOPOLOGY = '500_hosts_procedural_1' #'100_hosts_procedural_3' #
-WORKLOAD = '500_hosts_procedural_1' #'100_hosts_procedural_1' #
-SCENARIO = 'normal'
+ALGORITHM = 'baseline_slow' # Should eventually be picked via command line arg
+TOPOLOGY = '20_hosts_procedural_1'
+WORKLOAD = '20_hosts_procedural_1'
+SCENARIO = 'disruption'
 
 # fractal gaussian noise parameters
 RATE_DEVIATION = 1

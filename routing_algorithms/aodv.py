@@ -245,15 +245,16 @@ class Router(Medium):
             connection = self.get_neighbor(hop)
             if connection:
                 self.send(packet, connection)
-            else:
-                self.drop_packet(packet, 'missing neighbor')
+                return
+            # else:
+            #     self.drop_packet(packet, 'missing neighbor')
+        # else:
+        if len(self.buffer['route_pending']) < self.queue_max:
+            self.buffer['route_pending'].append(packet)
+            self.request_route(packet)
         else:
-            if len(self.buffer['route_pending']) < self.queue_max:
-                self.buffer['route_pending'].append(packet)
-                self.request_route(packet)
-            else:
-                self.drop_packet(packet, 'routing queue full')
-            #    raise SystemExit
+            self.drop_packet(packet, 'routing queue full')
+        #    raise SystemExit
     def count_buffers(self):
         count = 0
         count += len([i for i in self.buffer['in'] if i.content == ''])
