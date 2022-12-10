@@ -3,7 +3,10 @@
 N = 0.05
 
 class Scenario:
-    def __init__(self):
-        return
+    def __init__(self, media):
+        self.interval = (2000/round(len(media) * N))
+        self.counter = self.interval
     def tick(self, timestamp, media):
-        return
+        self.counter -= 1
+        if self.counter == 0:
+            self.counter = self.interval

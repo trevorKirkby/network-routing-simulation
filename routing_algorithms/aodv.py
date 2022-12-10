@@ -38,7 +38,7 @@ class Router(Medium):
         if len(self.buffer) < self.queue_max:
             self.buffer['in'].append(packet)
         else:
-            super(Router, self).receive_full(packet, one_hop_sender)
+            self.drop_packet(packet, 'in queue full')
             #raise SystemExit
     # Look up a neighbor medium by ID
     def get_neighbor(self, id):
@@ -55,7 +55,7 @@ class Router(Medium):
             if len(self.buffer['out']) < self.queue_max:
                 self.buffer['out'].append((target, packet))
             else:
-                self.drop_packet(packet)
+                self.drop_packet(packet, 'out queue full')
                 #raise SystemExit
     # Propagate a packet to all known neighbors
     def broadcast(self, packet, one_hop_sender=None):
@@ -246,16 +246,13 @@ class Router(Medium):
             if connection:
                 self.send(packet, connection)
             else:
-                self.drop_packet(packet)
-            #else:
-            #    print('AAAAA')
-            #    raise SystemExit
+                self.drop_packet(packet, 'missing neighbor')
         else:
             if len(self.buffer['route_pending']) < self.queue_max:
                 self.buffer['route_pending'].append(packet)
                 self.request_route(packet)
             else:
-                self.drop_packet(packet)
+                self.drop_packet(packet, 'routing queue full')
             #    raise SystemExit
     def count_buffers(self):
         count = 0

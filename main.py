@@ -20,9 +20,9 @@ algorithms = [os.path.splitext(filename)[0] for filename in os.listdir('routing_
 topologies = os.listdir('topologies')
 workloads = os.listdir('topologies')
 
-ALGORITHM = 'baseline_fast' # Should eventually be picked via command line arg
-TOPOLOGY = '20_hosts_procedural_1' #'100_hosts_procedural_3' #
-WORKLOAD = '20_hosts_procedural_7' #'100_hosts_procedural_1' #
+ALGORITHM = 'aodv' # Should eventually be picked via command line arg
+TOPOLOGY = '500_hosts_procedural_1' #'100_hosts_procedural_3' #
+WORKLOAD = '500_hosts_procedural_1' #'100_hosts_procedural_1' #
 SCENARIO = 'normal'
 
 # fractal gaussian noise parameters
@@ -32,7 +32,7 @@ HURST = 0.75 # While the specific value of this is a bit uncertain, most sources
 # animation / timing parameters
 LIMIT = 20000
 ANIMATION_SPEEDUP = 1#5
-ANIMATE = True
+ANIMATE = False
 
 stochastic_init(HURST)
 
@@ -75,7 +75,7 @@ def main():
         workload.append((vals[0], Packet(vals[1], vals[2], size=vals[3])))
     print('DONE LOADING WORKLOAD')
     print('LOADING SCENARIO')
-    scenario = globals()[SCENARIO.lower()].Scenario()
+    scenario = globals()[SCENARIO.lower()].Scenario(media)
     print('DONE LOADING SCENARIO')
     print('RUNNING SIMULATION')
     node_colors_animated = []

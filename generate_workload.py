@@ -2,11 +2,11 @@ import random
 import math
 
 # I/O
-OUTFILE = 'workloads/20_hosts_procedural_10.csv'
+OUTFILE = 'workloads/500_hosts_procedural_5.csv'
 
 # Setup
 N_HOSTS = 20
-N_CONNECTIONS = 8 # 8 for 20_hosts, 50 for 100_hosts, 150 for 500_hosts
+N_CONNECTIONS = 50 # 8 for 20_hosts, 50 for 100_hosts, 150 for 500_hosts
 TIME = 800 # 800 for 20_hosts, 2000 for 100_hosts and 500_hosts
 LEAD_TIME = 200 # Amount of time before any packets get sent, allows non-ad-hoc protocols some time to set up
 
@@ -16,7 +16,7 @@ DISTRIBUTION_PARAMETERS = {
     'packet_max' : 2000,
     'packet_pareto' : 0.1,
     # Connections
-    'connection_max' : 50,
+    'connection_max' : 50, # 50
     'connection_pareto' : 0.5,
 }
 
